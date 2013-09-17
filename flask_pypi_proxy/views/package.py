@@ -73,14 +73,14 @@ def package(package_type, letter, package_name, package_file):
         if not exists(package_path):
             makedirs(package_path)
 
-        with open(egg_filename, 'w') as egg_file:
+        with open(egg_filename, 'wb') as egg_file:
             egg_file.write(pypi_response.content)
 
-        with open(egg_filename) as egg_file:
+        with open(egg_filename, 'rb') as egg_file:
             filecontent = egg_file.read(-1)
             mimetype = mimetypes.guess_type(egg_filename)
 
-        with open(egg_filename + '.md5', 'w') as md5_output:
+        with open(egg_filename + '.md5', 'wb') as md5_output:
             md5 = get_md5_for_content(filecontent)
             md5_output.write(md5)
 
