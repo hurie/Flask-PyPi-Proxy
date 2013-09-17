@@ -15,7 +15,6 @@ setup(
     install_requires=[
         "Flask",
         "requests",
-        "python-magic",
         "beautifulsoup4"
     ],
     packages=find_packages(),

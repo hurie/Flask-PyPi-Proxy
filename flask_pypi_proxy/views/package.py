@@ -7,7 +7,7 @@ the version of the package to download.
 
 '''
 
-import magic
+import mimetypes
 from flask import make_response, request, abort
 from flask_pypi_proxy.app import app
 from flask_pypi_proxy.utils import (get_base_path, get_package_path,
@@ -41,7 +41,7 @@ def package(package_type, letter, package_name, package_file):
             return _respond(pypi_response.content, pypi_response.headers['content-type'])
 
         else:
-            mimetype = magic.from_file(egg_filename, mime=True)
+            mimetype = mimetypes.guess_type(egg_filename)
             return _respond('', mimetype)
 
     app.logger.debug('Downloading: %s', package_file)
@@ -52,7 +52,7 @@ def package(package_type, letter, package_name, package_file):
         path = join(path, package_file)
         with open(path, 'rb') as egg:
             content = egg.read(-1)
-        mimetype = magic.from_file(egg_filename, mime=True)
+        mimetype = mimetypes.guess_type(egg_filename)
         return _respond(content, mimetype)
 
     else:
@@ -78,7 +78,7 @@ def package(package_type, letter, package_name, package_file):
 
         with open(egg_filename) as egg_file:
             filecontent = egg_file.read(-1)
-            mimetype = magic.from_file(egg_filename, mime=True)
+            mimetype = mimetypes.guess_type(egg_filename)
 
         with open(egg_filename + '.md5', 'w') as md5_output:
             md5 = get_md5_for_content(filecontent)
