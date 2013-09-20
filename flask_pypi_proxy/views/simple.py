@@ -19,7 +19,7 @@ from flask_pypi_proxy.utils import (get_package_path, get_base_path,
                                     is_private, url_is_egg_file)
 
 
-VersionData = namedtuple('VersionData', ['name', 'md5', 'external_link'])
+VersionData = namedtuple('VersionData', ['type', 'name', 'md5', 'external_link'])
 
 
 @app.route('/simple/')
@@ -90,7 +90,7 @@ def simple_package(package_name):
 
             # remove .md5 extension
             name = filename[:-4]
-            data = VersionData(name, md5, None)
+            data = VersionData('source', name, md5, None)
             package_versions.append(data)
 
         return render_template('simple_package.html', **template_data)
@@ -143,8 +143,12 @@ def simple_package(package_name):
                 absolute_url = urlparse.urljoin(url, split_data.path)
 
                 external_link= urllib.urlencode({'remote': absolute_url})
-                data = VersionData(pk_name, md5_data, external_link)
+
+                pk_type = href.split('/')[3]
+                data = VersionData(pk_type, pk_name, md5_data, external_link)
                 package_versions.append(data)
+
+                app.logger.debug('pk_type: %s', pk_type)
                 continue
 
             parsed = urlparse.urlparse(href)
@@ -162,7 +166,9 @@ def simple_package(package_name):
 
                     absolute_url = urlparse.urljoin(url, parsed.path)
                     external_link= urllib.urlencode({'remote': absolute_url})
-                    data = VersionData(pk_name, md5_data, external_link)
+
+                    pk_type = parsed.path.split('/')[2]
+                    data = VersionData(pk_type, pk_name, md5_data, external_link)
                     package_versions.append(data)
 
                 else:
@@ -191,7 +197,7 @@ def simple_package(package_name):
                 continue
 
             external_link = urllib.urlencode({'remote': external_url})
-            data = VersionData(package_version, '', external_link)
+            data = VersionData('source', package_version, '', external_link)
             package_versions.append(data)
 
         package_versions.sort(key=lambda v: v.name)
